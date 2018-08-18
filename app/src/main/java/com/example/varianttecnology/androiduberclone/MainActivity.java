@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import dmax.dialog.SpotsDialog;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
                         dialogInterface.dismiss();
 
+                        btnSignIn.setEnabled(false);
+
                         if (TextUtils.isEmpty(edtEmail.getText().toString())) {
                             Snackbar.make(rootLayout, "Please enter email address", Snackbar.LENGTH_SHORT).show();
                             return;
@@ -112,18 +115,26 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
+                        final SpotsDialog waitingDialog = new SpotsDialog(MainActivity.this);
+                        waitingDialog.show();
+
+
                         auth.signInWithEmailAndPassword(edtEmail.getText().toString(),edtPassword.getText().toString())
                                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
+                                        waitingDialog.dismiss();
                                         startActivity(new Intent(MainActivity.this,Welcome.class));
                                         finish();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                waitingDialog.dismiss();
                                 Snackbar.make(rootLayout,"Failed"+e.getMessage(),Snackbar.LENGTH_SHORT)
                                         .show();
+
+                                btnSignIn.setEnabled(true);
                             }
                         });
 
